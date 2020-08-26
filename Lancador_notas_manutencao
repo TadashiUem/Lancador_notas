@@ -1,0 +1,453 @@
+
+# include <Keyboard.h>
+# include <Mouse.h>
+int SafeButton = 2;
+int ciclos = 0;
+int setciclos = 180; // Define quatidade de ciclos
+int Safe = 0;
+int mousemove = 0;
+int movX = 2;//define quantidade de movimento no eixo X
+int movY = 2;//define quantidade de movimento no eixo Y
+int rtecla = 0;//variavel usada para repetir pressionamento de tecla
+int mouseDelay = 300;
+int trocaTelaDelay = 2000;
+int salvarDelay = 5000;
+int escritaDelay = 100;
+int executarDelay = 3000;
+
+//Coordenadas
+int Ponto0 = 1020;//Coordenadas para referenciar cursor
+int movExcelX = 122;// Coodenadas para mover cursor Excel no eixo x
+int movExcelY = 490;// Coodenadas para mover cursor Excel no eixo y
+int movDefeitoX = 92;// Coodenadas para mover cursor Excel no eixo x
+int movDefeitoY = 130;// Coodenadas para mover cursor Excel no eixo y
+int movCodSAPX = 61;// Coodenadas para mover cursor Excel no eixo x
+int movCodSAPY = 31;// Coodenadas para mover cursor Excel no eixo y
+int movVerdeX = 20;// Coodenadas para mover cursor Excel no eixo x
+int movVerdeY = 31;// Coodenadas para mover cursor Excel no eixo y
+int movNotX = 100;// Coodenadas para mover cursor Excel no eixo x
+int movNotY = 350;// Coodenadas para mover cursor Excel no eixo y
+int movLoc_instX = 110;// Coodenadas para mover cursor Local instalacao no eixo x
+int movLoc_instY = 165;// Coodenadas para mover cursor Local instalacao no eixo y
+int movNotificX = 100;// Coodenadas para mover cursor Notificador no eixo x
+int movNotificY = 350;// Coodenadas para mover cursor Notificador no eixo y
+int movparteX  = 130;// Coodenadas para mover cursor parte objeto no eixo x
+int movparteY  = 210;// Coodenadas para mover cursor parte objeto no eixo y
+int movSitX = 150;// Coodenadas para mover cursor campo situacao no eixo x
+int movSitY = 250;// Coodenadas para mover cursor campo situacao no eixo y
+
+
+
+void setup() {
+  Keyboard.begin();
+  Mouse.begin();
+  pinMode(SafeButton, INPUT_PULLUP);
+}
+
+
+void refCursor(){//Referencia o cursor do mouse
+  mousemove =0;
+  while(mousemove<Ponto0){
+    Mouse.move(-movX, -movY);
+    mousemove++;
+  }
+  delay(mouseDelay); 
+}
+
+void clicarVerde(){//Clicar no verde SAP
+  refCursor();//referencia cursor do mouse
+  //move no eixo x
+  mousemove =0;
+  while(mousemove<movVerdeX){
+  Mouse.move(movX, 0);
+  mousemove++;
+  }
+  //move no eixo y
+  mousemove =0;
+  while(mousemove<movVerdeY){
+  Mouse.move(0, movY);
+  mousemove++;
+  }
+  Mouse.click(MOUSE_LEFT);
+  delay(executarDelay);
+}   
+
+void clicarExcel(){//Clicar no Excel:
+  //Referencia o cursor do mouse
+  refCursor();
+  
+  //Clicar no Excel
+  //move no eixo x
+  mousemove =0;
+  while(mousemove<movExcelX){
+  Mouse.move(movX, 0);
+  mousemove++;
+  }
+  //move no eixo y
+  mousemove =0;
+  while(mousemove<movExcelY){
+  Mouse.move(0, movY);
+  mousemove++;
+  }
+  Mouse.click(MOUSE_LEFT);
+  delay(trocaTelaDelay);
+}
+
+void clicarCodSAP(){
+  //Clicar no campo para digitar codigo SAP
+  refCursor();//Referencia o cursor do mouse
+  //move no eixo x
+  mousemove =0;
+  while(mousemove<movCodSAPX){
+  Mouse.move(movX, 0);
+  mousemove++;
+  }
+  //move no eixo y
+  mousemove =0;
+  while(mousemove<movCodSAPY){
+  Mouse.move(0, movY);
+  mousemove++;
+  }
+  Mouse.click(MOUSE_LEFT);
+  delay(mouseDelay);
+}
+
+void copiar(){
+  //Copiar
+  Keyboard.press(128);
+  Keyboard.press('c');
+  Keyboard.releaseAll();
+  delay(mouseDelay);
+}
+
+void colar(){
+  //Colar
+  Keyboard.press(128);
+  Keyboard.press('v');
+  Keyboard.releaseAll();
+  delay(mouseDelay);
+}
+
+void tabPress(int xTAB){//Pressionar TAB 
+  rtecla = 0;
+  while(rtecla < xTAB){
+  Keyboard.press(179);
+  Keyboard.release(179);
+  rtecla++;
+  delay(1000);
+  }
+  delay(100);
+}
+
+void loop() {
+  
+  while (ciclos<setciclos){ //realiza o procedimento abaixo numero de vezes determinado pelo setciclos
+  Safe = digitalRead(SafeButton); //Le sinal de entrada do botao on/off
+ 
+    if (Safe == LOW){//On/off teclado e mouse
+   
+
+    //Referencia o cursor do mouse
+      refCursor();
+      
+      //Pressiona Delete 2x (sempre lembrar x-1)
+      rtecla = 0;
+      while(rtecla<1){
+      Keyboard.press(212);
+      Keyboard.release(212);
+      rtecla++;
+      }
+      delay(escritaDelay);
+
+      //Escreve "N2" 
+      Keyboard.write('n');
+      Keyboard.write('2');
+      delay(escritaDelay);
+
+      //Clicar no verde SAP
+      refCursor();//Referencia o cursor do mouse
+      clicarVerde();//Clicar no verde SAP
+
+      //Clicar no Excel:
+      refCursor();//Referencia o cursor do mouse
+      clicarExcel();//Clicar no Excel
+
+      //Copiar
+      copiar();
+
+      //Clicar no Excel (Voltar para o SAP)
+      Mouse.click(MOUSE_LEFT);
+      delay(trocaTelaDelay);
+
+
+      //Colar descricao no SAP
+      colar();
+
+    
+      //Clicar no campo Local de instalacao
+      refCursor();//referencia cursor
+      //move no eixo x
+      mousemove =0;
+      while(mousemove<movLoc_instX){
+      Mouse.move(movX, 0);
+      mousemove++;
+      }
+      //move no eixo y
+      mousemove =0;
+      while(mousemove<movLoc_instY){
+      Mouse.move(0, movY);
+      mousemove++;
+      }//clica no campo loc. inst.
+      delay(mouseDelay);
+      Mouse.click(MOUSE_LEFT);
+      delay(mouseDelay);
+
+
+      //Clicar no Excel:
+      refCursor();
+      clicarExcel();//Clicar no Excel
+      
+      //Pressionar TAB 2x 
+      tabPress(2);
+
+      //Copiar
+      copiar();
+
+      //Retorna para o SAP
+      Mouse.click(MOUSE_LEFT);
+      delay(trocaTelaDelay);
+
+      //Colar informacao no SAP
+      colar();
+
+      //Clica no campo situacao
+      refCursor();//referencia cursor do mouse
+      //move no eixo x
+      mousemove =0;
+      while(mousemove<movSitX){
+      Mouse.move(movX, 0);
+      mousemove++;
+      }
+      //move no eixo y
+      mousemove =0;
+      while(mousemove<movSitY){
+      Mouse.move(0, movY);
+      mousemove++;
+      }
+      Mouse.click(MOUSE_LEFT);
+      delay(mouseDelay);
+
+      //Clicar excel 
+      clicarExcel();
+
+      //Pressionar TAB 1x
+      tabPress(1);
+
+      //copiar
+      copiar();
+
+      //Alterar para SAP
+      Mouse.click(MOUSE_LEFT);
+      delay(trocaTelaDelay);
+
+      //colar
+      colar();
+      
+      //Clicar no Notificador:
+      refCursor();//Referencia o cursor do mouse
+      //Clicar campo notificador SAP
+      //move no eixo x
+      mousemove = 0;
+      while(mousemove<movNotX){
+      Mouse.move(movX, 0);
+      mousemove++;
+      }
+      //move no eixo y
+      mousemove =0;
+      while(mousemove<movNotY){
+      Mouse.move(0, movY);
+      mousemove++;
+      }
+      Mouse.click(MOUSE_LEFT);
+      delay(mouseDelay);
+
+
+
+      //Escreve "TADASHI"
+      Keyboard.press(129);
+      Keyboard.write('T');
+      Keyboard.write('A');
+      Keyboard.write('D');
+      Keyboard.write('A');
+      Keyboard.write('S');
+      Keyboard.write('H');
+      Keyboard.write('I');
+      Keyboard.releaseAll();
+      delay(escritaDelay);
+
+
+      //Clicar na aba Defeito
+      refCursor();//Referencia o cursor do mouse
+      //move no eixo x
+      mousemove =0;
+      while(mousemove<movDefeitoX){
+      Mouse.move(movX, 0);
+      mousemove++;
+      }
+      //move no eixo y
+      mousemove =0;
+      while(mousemove<movDefeitoY){
+      Mouse.move(0, movY);
+      mousemove++;
+      }
+      Mouse.click(MOUSE_LEFT);
+      delay(salvarDelay);
+      
+
+      //Clica no campo parte objeto
+      refCursor();//referencia cursor do mouse
+      //move no eixo x
+      mousemove =0;
+      while(mousemove<movparteX){
+      Mouse.move(movX, 0);
+      mousemove++;
+      }
+      //move no eixo y
+      mousemove =0;
+      while(mousemove<movparteY){
+      Mouse.move(0, movY);
+      mousemove++;
+      }
+      Mouse.click(MOUSE_LEFT);
+      delay(mouseDelay);
+ 
+
+      //Escreve "0020"
+      Keyboard.write('0');
+      Keyboard.write('0');
+      Keyboard.write('2');
+      Keyboard.write('0');
+      delay(escritaDelay);
+
+
+      //Pressionar TAB 3x    
+      tabPress(3);
+
+      //Escreve "0121"
+      Keyboard.write('0');
+      Keyboard.write('1');
+      Keyboard.write('2');
+      Keyboard.write('1');
+      delay(escritaDelay);
+
+
+      //Pressionar TAB 5x 
+      tabPress(5);
+      
+      //Escreve "0240"
+      Keyboard.write('0');
+      Keyboard.write('2');
+      Keyboard.write('4');
+      Keyboard.write('0');
+      delay(escritaDelay);
+
+
+      //Pressiona CTRL + s (salvar)
+      Keyboard.press(128);
+      Keyboard.press('s');
+      Keyboard.releaseAll();
+      delay(6000);
+
+
+      //Referencia o cursor do mouse
+      refCursor();
+
+
+      //Clicar no campo para digitar codigo SAP
+      clicarCodSAP();
+
+
+      //Escreve codigo no SAP
+      Keyboard.write(47);
+      Keyboard.write('n');
+      Keyboard.press(32);
+      Keyboard.release(32);
+      Keyboard.write('i');
+      Keyboard.write('w');
+      Keyboard.write('2');
+      Keyboard.write('2');
+      delay(escritaDelay);
+
+
+      //Clicar no verde SAP
+      clicarVerde();
+
+      //Pressiona CTRL + a (seleciona tudo)
+      Keyboard.press(128);
+      Keyboard.press('a');
+      Keyboard.releaseAll();
+      delay(escritaDelay);
+
+      //Copiar
+      copiar();
+
+      //Clicar no Excel:
+      clicarExcel();
+
+      //Pressionar SHIFT + TAB 2x 
+      rtecla = 0;
+      while(rtecla<1){
+      Keyboard.press(KEY_LEFT_SHIFT);  
+      Keyboard.press(179);
+      Keyboard.release(179);
+      Keyboard.press(179);
+      Keyboard.releaseAll();
+      rtecla++;
+      delay(1000);
+      }
+      delay(2000);
+
+      //Colar
+      colar();
+
+      //Pressiona SHIFT + TAB 
+      Keyboard.press(KEY_LEFT_SHIFT);  
+      Keyboard.press(179);
+      Keyboard.releaseAll();
+      delay(1000);
+
+
+      //Pressiona Seta para baixo
+      Keyboard.press(KEY_DOWN_ARROW);  
+      Keyboard.releaseAll();
+      delay(1000);
+
+
+      //Retorna para o SAP
+      Mouse.click(MOUSE_LEFT);
+      delay(trocaTelaDelay);
+
+
+      //Clicar no campo para digitar codigo SAP
+      clicarCodSAP();
+
+      //Escreve codigo no SAP
+      Keyboard.write(47);
+      Keyboard.write('n');
+      Keyboard.press(32);
+      Keyboard.release(32);
+      Keyboard.write('i');
+      Keyboard.write('w');
+      Keyboard.write('2');
+      Keyboard.write('1');
+      delay(escritaDelay);
+
+      //Clicar no verde SAP
+      clicarVerde();
+      
+      //FIM DO LOOP
+ 
+      ciclos++;
+      }
+  }
+}
